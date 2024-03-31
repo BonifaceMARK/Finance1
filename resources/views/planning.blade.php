@@ -1,6 +1,6 @@
 @extends('layout.title')
 
-@section('title', 'Financial Planning - Cost Allocation Methods')
+@section('title', 'Financial Planning')
 
 @include('layout.title')
 
@@ -43,13 +43,17 @@
 
 <div class="card">
     <div class="card-body">
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createExpenseCategoryModal">
+                <i class="bi bi-file-text fs-1 d-block"></i>
+                <span class="fs-6 d-block">Create Expense Category</span>
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCostAllocationMethodModal">
+                <i class="bi bi-file-text fs-1 d-block"></i>
+                <span class="fs-6 d-block">Create Cost Allocation Method</span>
+            </button>
+        </div>
 
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createExpenseCategoryModal">
-        <i class="bi bi-file-text"></i> Create Expense Category
-    </button>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCostAllocationMethodModal">
-        Create Cost Allocation Method
-    </button>
 
 
     </div>

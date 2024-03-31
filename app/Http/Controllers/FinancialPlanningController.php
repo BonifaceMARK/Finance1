@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ExpenseCategory;
+
 use Illuminate\Http\Request;
 use App\Models\CostAllocationMethod;
+use App\Models\ExpenseCategory;
 
 class FinancialPlanningController extends Controller
 {

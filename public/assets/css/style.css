@@ -514,6 +514,30 @@
     box-shadow: 0 0 10px 0 rgba(1, 41, 112, 0.15);
     border: 1px solid rgba(1, 41, 112, 0.3);
   }
+  .dashboard-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+.dashboard-card h2 {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.dashboard-card p {
+    color: #666;
+    line-height: 1.6;
+}
+.dashboard-image {
+    margin-bottom: 20px;
+}
+.dashboard-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
 
   .header .search-form button {
     border: 0;
