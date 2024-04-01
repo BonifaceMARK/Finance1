@@ -10,9 +10,9 @@ class FinancialPlanningController extends Controller
 {
     public function index()
     {
-        $expenseCategories = ExpenseCategory::all();
 
-        return view('planning', compact('expenseCategories'));
+
+        return view('planning');
     }
     public function storeExpense(Request $request)
     {
@@ -28,7 +28,7 @@ class FinancialPlanningController extends Controller
             'expense_description' => $request->expense_description,
         ]);
 
-        return redirect()->route('Financial.Planning')->with('success', 'Expense category created successfully.');
+        return redirect()->route('report.index')->with('success', 'Expense category created successfully.');
     }
     public function storeCost(Request $request)
     {
@@ -40,7 +40,7 @@ class FinancialPlanningController extends Controller
 
         CostAllocationMethod::create($request->all());
 
-        return redirect()->route('Financial.Planning')
+        return redirect()->route('report.index')
             ->with('success', 'Cost allocation method created successfully.');
     }
 }

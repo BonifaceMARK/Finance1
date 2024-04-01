@@ -10,8 +10,8 @@
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav"  href="{{route('Financial.Planning')}}">
-            <i class="bi bi-file-earmark-text"></i><span>Financial Planning</span>
+        <a class="nav-link collapsed" data-bs-target="#components-nav"  href="{{route('report.index')}}">
+            <i class="bi bi-newspaper"></i><span>Financial Planning & Report</span>
         </a>
       </li><!-- End Components Nav -->
 
@@ -21,11 +21,7 @@
         </a>
       </li><!-- End Components Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav"  href="{{route('report.index')}}">
-            <i class="bi bi-newspaper"></i><span>Financial Report</span>
-        </a>
-      </li><!-- End Components Nav -->
+
 
 
     </ul>

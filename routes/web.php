@@ -29,6 +29,14 @@ Route::get('/financial/reporting', [ReportingController::class, 'index'])->name(
 
 Route::get('/financialplan', [ApiController::class, 'getCashOutflows']);
 
-Route::get('/bato', [ApiController::class, 'fetch']);
+Route::post('/add-expense-from-external', [CashController::class, 'addExpenseFromExternal'])->name('addExpenseFromExternal');
+
+Route::get('/budgets/{id}', [CashController::class, 'showBudget'])->name('budget.show');
+
+// Route for allocating budget
+Route::post('/allocate/{id}/budget', [CashController::class, 'allocate'])->name('budget.allocate');
+
 
 Route::get('/Cost', [ReportingController::class, 'fetchCost']);
+
+Route::get('/bato', [ApiController::class, 'fetch']);

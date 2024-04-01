@@ -17,5 +17,6 @@ class CashManagement extends Model
     protected $fillable = [
         'inflow',
         'outflow',
+        'net_income',
     ];
 }

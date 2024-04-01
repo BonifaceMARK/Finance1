@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/costApi', [ApiController::class, 'getAllCost']);
 
 
-Route::get('/bato', [ApiController::class, 'fetch']);
+
+
 
 
