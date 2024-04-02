@@ -119,25 +119,31 @@ class CashController extends Controller
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
-    public function addExpenseFromExternal(Request $request)
-    {
-        // Fetch expense amount from external API
-        $response = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
-        $expenses = $response->json();
+  public function addExpenseFromExternal(Request $request)
+{
+    // Fetch expense amount from external API
+    $response = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
+    $expenses = $response->json();
 
-        // Get the total expense amount
-        $totalOutflow = collect($expenses)->sum('amount');
+    // Get the total expense amount
+    $totalOutflow = collect($expenses)->sum('amount');
 
-        // Create a new CashManagement instance for the outflow
-        if ($totalOutflow > 0) {
-            CashManagement::create([
-                'outflow' => $totalOutflow,
-            ]);
-            // Redirect back with success message
-            return redirect()->back()->with('success', 'Expenses Allocated Successfully');
-        } else {
-            // If no expenses found, return an error message
-            return redirect()->back()->withErrors(['error' => 'No expenses found.']);
-        }
+    // Get the total inflow
+    $totalInflow = CashManagement::sum('inflow');
+
+    // Check if inflow is less than outflow
+    if ($totalInflow < $totalOutflow) {
+        // If insufficient funds, return an error message
+        return redirect()->back()->withErrors(['error' => 'Insufficient funds.']);
+    }
+
+    // Create a new CashManagement instance for the outflow
+    CashManagement::create([
+        'outflow' => $totalOutflow,
+    ]);
+
+    // Redirect back with success message
+    return redirect()->back()->with('success', 'Expenses Allocated Successfully');
 }
+
 }

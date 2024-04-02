@@ -101,7 +101,7 @@
                 <button type="button" class="btn btn-primary btn-sm w-100 position-relative" data-bs-toggle="modal" data-bs-target="#createCostAllocationMethodModal">
                     <img src="{{ asset('assets/img/paying.jpg') }}" alt="Image" class="img-fluid mb-1">
                     <div class="position-absolute top-50 start-50 translate-middle">
-                        <i class="bi bi-file-text fs-4 me-2"></i>
+
                         <span class="fs-6"><strong>Create Cost Allocation Method</strong></span>
                     </div>
                 </button>
@@ -115,7 +115,7 @@
                 <button type="button" class="btn btn-primary btn-sm w-100 position-relative" data-bs-toggle="modal" data-bs-target="#createExpenseCategoryModal">
                     <img src="{{ asset('assets/img/exp.jpg') }}" alt="Image" class="img-fluid">
                     <div class="position-absolute top-50 start-50 translate-middle">
-                        <i class="bi bi-file-text fs-4 me-2"></i>
+
                         <span class="fs-6"><strong>Create Expense Category</strong></span>
                     </div>
                 </button>
