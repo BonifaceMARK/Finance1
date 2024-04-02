@@ -9,7 +9,7 @@
   <!-- ======= Sidebar ======= -->
 @include('layout.sidebar')
 
-  <main id="main" class="main">
+<main id="main" class="main" >
 
     <div class="pagetitle">
       <h1>Cash Management</h1>
@@ -20,6 +20,8 @@
         </ol>
     </nav>
     </div><!-- End Page Title -->
+    <section>
+        <div >
 
 <!-- If-else statement -->
 @if(session('success'))
@@ -39,39 +41,38 @@
 
 <div class="container">
     <div class="row">
-        <!-- Income and Outflow card -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Income and Outflow</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Income</th>
-                                    <th scope="col">Outflow</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($cashManagements as $cashManagement)
-                                    <tr>
-                                        <td @if($cashManagement->inflow < $cashManagement->outflow) class="text-danger" @else class="text-success" @endif>
-                                            ${{ number_format($cashManagement->inflow, 2) }}
-                                        </td>
-                                        <td @if($cashManagement->outflow < $cashManagement->inflow) class="text-success" @else class="text-danger" @endif>
-                                            ${{ number_format($cashManagement->outflow, 2) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+     <!-- Income and Outflow card -->
+<div class="col-md-6 mb-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Revenue and Outflow</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Revenue</th>
+                            <th scope="col">Outflow</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="{{ $totalInflow < $totalOutflow ? 'text-danger' : 'text-success' }}">
+                                ${{ number_format($totalInflow, 2) }}
+                            </td>
+                            <td class="{{ $totalOutflow < $totalInflow ? 'text-success' : 'text-danger' }}">
+                                ${{ number_format($totalOutflow, 2) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        <!-- End Income and Outflow card -->
+    </div>
+</div>
+<!-- End Income and Outflow card -->
+
 
         <!-- Expenses card -->
         <div class="col-md-6 mb-4">
@@ -143,15 +144,16 @@
         </div>
     </div>
     <div class="container">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-               <h5 class="mb-0">Budget List</h5>
+        <div class="card shadow" style="background-image: url('{{ asset('assets/img/budge.jpg') }}'); background-size: cover; opacity: 1;">
+            <div class="card-header text-white"  style="background-color: rgba(255, 255, 255, 0.5);">
+                <h3 class="mb-0 "><strong>Budget Requests</strong></h3>
             </div>
+
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover">
                         <thead>
-                            <tr>
+                            <tr class="table-primary">
                                 <th class="text-center">#</th>
                                 <th>Title</th>
                                 <th>Status</th>
@@ -205,7 +207,8 @@
                                     <dd class="col-sm-8">{{ $budget['id'] }}</dd>
 
                                     <dt class="col-sm-4">Amount:</dt>
-                                    <dd class="col-sm-8">{{ $budget['amount'] }}</dd>
+                                    <dd class="col-sm-8">{{ number_format($budget['amount'], 2) }}</dd>
+
 
                                     <dt class="col-sm-4">Status:</dt>
                                     <dd class="col-sm-8">{{ $budget['status'] ?? 'Unknown' }}</dd>
@@ -244,14 +247,8 @@
     </div>
     <!-- End Modal for budget details -->
     @endforeach
-
-
-
-
-
-
-
-
+</div>
+</section>
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->

@@ -12,47 +12,34 @@ use Illuminate\Validation\ValidationException;
 class CashController extends Controller
 {
     public function index()
-{
-    try {
-        $expensesResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
-        $costsResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/costApi');
-        $budgetsResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/budgetApi');
-        $paymentResponse = Http::get('https://fms5-iasipgcc.fguardians-fms.com/payment');
+    {
+        try {
+            $expensesResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
+            $budgetsResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/budgetApi');
+            $paymentResponse = Http::get('https://fms5-iasipgcc.fguardians-fms.com/payment');
 
-        if ($expensesResponse->successful() && $costsResponse->successful() && $budgetsResponse->successful() && $paymentResponse->successful()) {
-            $expenses = $expensesResponse->json();
-            $costs = $costsResponse->json();
-            $budgets = $budgetsResponse->json();
-            $paymentData = $paymentResponse->json();
+            if ($expensesResponse->successful() && $budgetsResponse->successful() && $paymentResponse->successful()) {
+                $expenses = $expensesResponse->json();
+                $budgets = $budgetsResponse->json();
+                $paymentData = $paymentResponse->json();
+                $filteredPaymentData = collect($paymentData)->reject(function ($transaction) {
+                    return $transaction['transactionStatus'] === 'Pending' || $transaction['transactionStatus'] === 'Rejected';
+                });
+                $cashManagements = CashManagement::all();
+                $totalInflow = $cashManagements->sum('inflow');
 
-            // Fetch CashManagement data from the database
-            $cashManagements = CashManagement::all();
+                $totalOutflow = $cashManagements->sum('outflow');
 
-            // Fetch budget details for the first budget (you may adjust this logic as needed)
-            $firstBudget = $budgets[0] ?? null;
-            $budgetDetails = null;
-            if ($firstBudget) {
-                $budgetDetailsResponse = Http::get('https://fms2-ecabf.fguardians-fms.com/api/budgetApi/' . $firstBudget['id']);
-                if ($budgetDetailsResponse->successful()) {
-                    $budgetDetails = $budgetDetailsResponse->json();
-                }
+                return view('cash', compact('totalInflow', 'expenses', 'cashManagements', 'budgets', 'filteredPaymentData', 'totalOutflow'));
+            } else {
+                $errorMessage = $expensesResponse->failed() ? 'Failed to fetch expenses data from the external API' : 'Failed to fetch payment data from the external API';
+                return back()->withError($errorMessage);
             }
+        } catch (\Exception $e) {
 
-            // Sum of all expenses amounts
-            $totalOutflow = collect($expenses)->sum('amount');
-
-            // Pass other data to the view
-            return view('cash', compact('expenses', 'cashManagements', 'totalOutflow', 'budgets', 'budgetDetails', 'paymentData'));
-        } else {
-            // Handle failed API requests
-            $errorMessage = $expensesResponse->failed() ? 'Failed to fetch expenses data from the external API' : ($costsResponse->failed() ? 'Failed to fetch costs data from the external API' : 'Failed to fetch payment data from the external API');
-            return back()->withError($errorMessage);
+            return back()->withError($e->getMessage());
         }
-    } catch (\Exception $e) {
-        // Handle other exceptions
-        return back()->withError($e->getMessage());
     }
-}
 
 
 
@@ -79,36 +66,38 @@ class CashController extends Controller
             // Retrieve the budget data from the hidden input field
             $budget = json_decode($request->input('budget'), true);
 
-            // Check if budget data exists
-            if (!$budget) {
-                throw ValidationException::withMessages(['error' => 'Budget data not found']);
-            }
-
-            // Perform the allocation logic
             $inflowAmount = $budget['amount']; // Assuming the full budget amount is allocated
             // You may adjust this based on your business logic
 
             // Get the total inflow amount
             $totalInflow = CashManagement::sum('inflow');
 
-            // Check if the inflow amount exceeds the total inflow
+            // Calculate the total outflow amount
+            $totalOutflow = CashManagement::sum('outflow');
+
+            // Check if the allocated budget amount exceeds the total inflow
             if ($inflowAmount > $totalInflow) {
                 throw ValidationException::withMessages(['error' => 'Insufficient Funds']);
+            }
+
+            // Check if inflow is less than outflow
+            if ($totalInflow < $totalOutflow) {
+                // If insufficient funds, return an error message
+                return redirect()->back()->withErrors(['error' => 'Insufficient funds.']);
             }
 
             // Update the allocated budget in the database
             AllocatedBudget::create([
                 'budget_id' => $budget['id'],
-                'amount' => $inflowAmount,
+                'amount' => $totalOutflow,
             ]);
 
-            // Deduct the inflow amount from the total inflow
-            $remainingInflow = $totalInflow - $inflowAmount;
-
             // Update the CashManagement model to deduct the inflow amount and add it to outflow
+            $updatedOutflow = $totalOutflow + $inflowAmount;
             CashManagement::create([
-                'inflow' => $remainingInflow, // Deduct inflow amount
-                'outflow' => -$inflowAmount, // Add inflow amount to outflow
+                'inflow' => $inflowAmount,
+                'outflow' => $updatedOutflow,
+                'net_income' => $totalInflow - $updatedOutflow,
             ]);
 
             // Redirect to the cash.index route with success message
@@ -119,31 +108,40 @@ class CashController extends Controller
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
-  public function addExpenseFromExternal(Request $request)
-{
-    // Fetch expense amount from external API
-    $response = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
-    $expenses = $response->json();
 
-    // Get the total expense amount
-    $totalOutflow = collect($expenses)->sum('amount');
+    public function addExpenseFromExternal(Request $request)
+    {
+        try {
+            // Fetch expense amount from external API
+            $response = Http::get('https://fms2-ecabf.fguardians-fms.com/api/expensesApi');
+            $expenses = $response->json();
 
-    // Get the total inflow
-    $totalInflow = CashManagement::sum('inflow');
+            // Get the total expense amount
+            $totalOutflow = collect($expenses)->sum('amount');
 
-    // Check if inflow is less than outflow
-    if ($totalInflow < $totalOutflow) {
-        // If insufficient funds, return an error message
-        return redirect()->back()->withErrors(['error' => 'Insufficient funds.']);
+            // Get the sum of all inflow values from CashManagement table
+            $totalInflow = CashManagement::sum('inflow');
+
+            // Calculate net income
+            $netIncome = $totalInflow - $totalOutflow;
+
+            // Check if inflow is less than outflow
+            if ($netIncome < 0) {
+                // If insufficient funds, return an error message
+                return redirect()->back()->withErrors(['error' => 'Insufficient funds.']);
+            }
+
+            // Create a new CashManagement instance for the outflow
+            CashManagement::create([
+                'outflow' => $totalOutflow,
+            ]);
+
+            // Redirect back with success message
+            return redirect()->back()->with('success', 'Expenses Allocated Successfully');
+        } catch (\Exception $e) {
+            // Handle exceptions
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
-
-    // Create a new CashManagement instance for the outflow
-    CashManagement::create([
-        'outflow' => $totalOutflow,
-    ]);
-
-    // Redirect back with success message
-    return redirect()->back()->with('success', 'Expenses Allocated Successfully');
-}
 
 }
