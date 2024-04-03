@@ -41,11 +41,11 @@
 
 <div class="container">
     <div class="row">
-     <!-- Income and Outflow card -->
-<div class="col-md-6 mb-4">
+   <!-- Income and Outflow card -->
+<div class="col-md-12 mb-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Revenue and Outflow</h5>
+            <h3 class="mb-0">Revenue and Outflow</h3>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -58,10 +58,10 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="{{ $totalInflow < $totalOutflow ? 'text-danger' : 'text-success' }}">
+                            <td class="text-success">
                                 ${{ number_format($totalInflow, 2) }}
                             </td>
-                            <td class="{{ $totalOutflow < $totalInflow ? 'text-success' : 'text-danger' }}">
+                            <td class="text-danger">
                                 ${{ number_format($totalOutflow, 2) }}
                             </td>
                         </tr>
@@ -74,71 +74,6 @@
 <!-- End Income and Outflow card -->
 
 
-        <!-- Expenses card -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Expenses</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Amount</th>
-                                    <th scope="col">Category</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($expenses as $expense)
-                                    <tr>
-                                        <td>{{ $expense['date'] }}</td>
-                                        <td>${{ number_format($expense['amount'], 2) }}</td>
-                                        <td>{{ $expense['category'] }}</td>
-                                    </tr>
-                                @endforeach
-                                <tr>
-                                    <td colspan="2" class="text-right font-weight-bold">Total Outflow:</td>
-                                    <td>${{ number_format($totalOutflow, 2) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- Button to trigger confirmation modal -->
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmAddExpenseModal">Add Expense</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End Expenses card -->
-    </div>
-</div>
-
-
-                    <!-- Confirmation Modal -->
-                    <div class="modal fade" id="confirmAddExpenseModal" tabindex="-1" aria-labelledby="confirmAddExpenseModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmAddExpenseModalLabel">Confirmation</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to add the expense? This will deduct your income.
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <form action="{{ route('addExpenseFromExternal') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-primary">Add Expense</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -146,7 +81,7 @@
     <div class="container">
         <div class="card shadow" style="background-image: url('{{ asset('assets/img/budge.jpg') }}'); background-size: cover; opacity: 1;">
             <div class="card-header text-white"  style="background-color: rgba(255, 255, 255, 0.5);">
-                <h3 class="mb-0 "><strong>Budget Requests</strong></h3>
+                <h5 class="mb-0 "><strong>Budget Requests</strong></h5>
             </div>
 
             <div class="card-body">
@@ -209,7 +144,6 @@
                                     <dt class="col-sm-4">Amount:</dt>
                                     <dd class="col-sm-8">{{ number_format($budget['amount'], 2) }}</dd>
 
-
                                     <dt class="col-sm-4">Status:</dt>
                                     <dd class="col-sm-8">{{ $budget['status'] ?? 'Unknown' }}</dd>
                                 </dl>
@@ -234,19 +168,24 @@
                 </div>
                 <div class="modal-footer bg-primary">
                     <!-- Form to allocate budget -->
-                    <form action="{{ route('budget.allocate', $budget['id']) }}" method="POST">
-                        @csrf
-                        <!-- Add hidden input field to pass budget data -->
-                        <input type="hidden" name="budget" value="{{ json_encode($budget) }}">
-                        <button type="submit" class="btn btn-success">Allocate Budget</button>
-                    </form>
+                    @if ($budget['status'] === 'approved')
+                        <form action="{{ route('budget.allocate', $budget['id']) }}" method="POST">
+                            @csrf
+                            <!-- Add hidden input field to pass budget data -->
+                            <input type="hidden" name="budget" value="{{ json_encode($budget) }}">
+                            <button type="submit" class="btn btn-success">Allocate Budget</button>
+                        </form>
+                    @else
+                        <button type="button" class="btn btn-secondary disabled" disabled>Cannot Allocate Budget</button>
+                    @endif
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- End Modal for budget details -->
-    @endforeach
+@endforeach
+
 </div>
 </section>
   </main><!-- End #main -->

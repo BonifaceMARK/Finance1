@@ -36,7 +36,9 @@ Route::get('/budgets/{id}', [CashController::class, 'showBudget'])->name('budget
 // Route for allocating budget
 Route::post('/allocate/{id}/budget', [CashController::class, 'allocate'])->name('budget.allocate');
 
-
+//API
 Route::get('/Cost', [ReportingController::class, 'fetchCost']);
-
 Route::get('/bato', [ApiController::class, 'fetch']);
+Route::get('/allocatebud', [ApiController::class, 'fetchAllocatedBudget']);
+Route::get('/cash', [ApiController::class, 'fetchCashManagement']);
+Route::get('/method', [ApiController::class, 'CategoryMethod']);

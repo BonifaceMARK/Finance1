@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\CostAllocationMethod;
 use App\Models\ExpenseCategory;
 use App\Models\CashManagement;
+use App\Models\AllocatedBudget;
+
+
 
 class ApiController extends Controller
 {
@@ -41,21 +44,7 @@ class ApiController extends Controller
         }
     }
 
-    public function getCashOutflows()
-    {
 
-        $costAllocationMethods = CostAllocationMethod::all();
-        $expenseCategories = ExpenseCategory::all();
-
-
-        $data = [
-            'cost_allocation_methods' => $costAllocationMethods,
-            'expense_categories' => $expenseCategories,
-        ];
-
-
-        return response()->json($data);
-    }
     public function fetch()
     {
         $response = Http::get('https://fms5-iasipgcc.fguardians-fms.com/payment');
@@ -67,5 +56,31 @@ class ApiController extends Controller
             return response()->json(['error' => 'Failed to fetch data from the external API'], $response->status());
         }
     }
+    public function fetchAllocatedBudget()
+    {
+        $allocatedBudgets = AllocatedBudget::all();
+        return response()->json($allocatedBudgets);
+    }
 
+    public function fetchCashManagement()
+    {
+        $cashManagement = CashManagement::all();
+
+        return response()->json([
+            'success' => true,
+            'data' => $cashManagement,
+        ]);
+    }
+
+    public function CategoryMethod()
+    {
+        $costAllocationMethods = CostAllocationMethod::all();
+        $expenseCategories = ExpenseCategory::all();
+
+        return response()->json([
+            'success' => true,
+            'cost_allocation_methods' => $costAllocationMethods,
+            'expense_categories' => $expenseCategories,
+        ]);
+    }
 }

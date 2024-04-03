@@ -40,17 +40,17 @@
 @endif
 
 
-<div class="container mt-4">
+<div class="container mt-12">
     <div class="row">
         <!-- Financial Health Status card -->
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Financial Health Status</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -75,11 +75,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="alert alert-info">
                                 <strong>Note:</strong> This financial health status is based on the calculation of Net Income.
                             </div>
-                            <h4 class="text-right mb-0">Net Income: <span class="{{ $netIncomeStatus }}">{{ $netIncome }}</span></h4>
+                            <h4 class="text-right mb-0">Net Income: <span class="{{ $netIncomeStatus }}">{{ number_format($netIncome, 2) }}</span></h4>
                             <p class="text-right">
                                 @if ($netIncomeStatus == 'status-good')
                                     Congratulations! Your financial health status is good.
