@@ -36,6 +36,7 @@
   <!-- Bootstrap Bundle JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- =======================================================
   * Template Name: NiceAdmin

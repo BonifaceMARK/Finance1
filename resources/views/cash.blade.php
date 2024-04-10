@@ -3,9 +3,9 @@
 @section('title', 'Cash Management')
 @include('layout.title')
 
-@include('layout.header')
-<body>
 
+<body>
+    @include('layout.header')
   <!-- ======= Sidebar ======= -->
 @include('layout.sidebar')
 
@@ -97,17 +97,19 @@
                         </thead>
                         <tbody>
                             @forelse ($budgets ?? [] as $budget)
-                                <tr>
-                                    <td class="text-center">{{ $budget['id'] }}</td>
-                                    <td>{{ $budget['title'] }}</td>
-                                    <td>{{ $budget['status'] ?? 'Unknown' }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#budgetModal{{ $budget['id'] }}">View</button>
-                                    </td>
-                                </tr>
+                                @if ($budget['status'] == 'pending')
+                                    <tr>
+                                        <td class="text-center">{{ $budget['id'] }}</td>
+                                        <td>{{ $budget['title'] }}</td>
+                                        <td>{{ $budget['status'] }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#budgetModal{{ $budget['id'] }}">View</button>
+                                        </td>
+                                    </tr>
+                                @endif
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No budgets found</td>
+                                    <td colspan="4" class="text-center">No pending budgets found</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -116,6 +118,7 @@
             </div>
         </div>
     </div>
+
 
 
 

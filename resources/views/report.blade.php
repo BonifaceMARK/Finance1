@@ -3,9 +3,9 @@
 @section('title', 'Financial Planning & Reporting')
 @include('layout.title')
 
-@include('layout.header')
-<body>
 
+<body>
+    @include('layout.header')
   <!-- ======= Sidebar ======= -->
 @include('layout.sidebar')
 
@@ -122,7 +122,48 @@
                 </button>
             </div>
         </div>
+        <div class="col-md-3 mb-3">
+
         <!-- End Create Expense Category Button -->
+        <canvas id="pieChart" width="400" height="400"></canvas>
+    </div>
+
+
+        <script>
+            var data = @json($data);
+            var labels = Object.keys(data);
+            var values = Object.values(data);
+
+            var ctx = document.getElementById('pieChart').getContext('2d');
+            var pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Allocation Summary'
+                    }
+                }
+            });
+        </script>
     </div>
 
   <!-- Financial Report Document -->

@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\CashManagement;
 use App\Models\ExpenseCategory;
+use App\Models\AllocatedBudget;
+
 
 class ReportingController extends Controller
 {
@@ -52,7 +54,20 @@ class ReportingController extends Controller
 
                 $expenseCategories = ExpenseCategory::all();
 
-                return view('report', compact('totalInflow', 'netIncome', 'netIncomeStatus', 'totalOutflow', 'netIncome', 'costs', 'paymentData', 'previousRevenue', 'percentageIncrease', 'expenseCategories'));
+                $allocatedBudgetTotal = AllocatedBudget::sum('amount');
+                $cashInflowTotal = CashManagement::sum('inflow');
+                $cashOutflowTotal = CashManagement::sum('outflow');
+                $cashNetIncomeTotal = CashManagement::sum('net_income');
+
+                // Prepare data for the pie chart
+                $data = [
+                    'Allocated Budget' => $allocatedBudgetTotal,
+                    'Cash Inflow' => $cashInflowTotal,
+                    'Cash Outflow' => $cashOutflowTotal,
+                    'Net Income' => $cashNetIncomeTotal,
+                ];
+
+                return view('report', compact('totalInflow', 'data', 'netIncomeStatus', 'totalOutflow', 'netIncome', 'costs', 'paymentData', 'previousRevenue', 'percentageIncrease', 'expenseCategories'));
             } else {
                 $errorMessage = $costsResponse->failed() ? 'Failed to fetch costs data from the external API' : 'Failed to fetch payment data from the external API';
                 return back()->withError($errorMessage);
