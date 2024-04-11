@@ -20,24 +20,116 @@
         </ol>
         <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#financialReportModal">
-    View Expenses Financial Report
+     Expenses Financial Report
 </button>
 
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#costAllocationModal">
-    View Cost Allocation Report
+     Cost Allocation Report
 </button>
 
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#budgetReportModal">
-        View Budget Report
+         Budget Report
     </button>
+
+    <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientsModal">
+     Risk Management Report
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="clientsModal" tabindex="-1" aria-labelledby="clientsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clientsModalLabel">Clients Risk Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Client Name</th>
+                                <th>Company Name</th>
+                                <th>Risk Manager</th>
+                                <th>Commercial Budget</th>
+                                <th>Industry Sector</th>
+                                <th>Description</th>
+                                <th>Facility</th>
+                                <th>Risk Owner</th>
+                                <th>Date Raised</th>
+                                <th>Risk Occurrence</th>
+                                <th>Risk Bearer</th>
+                                <th>Probability</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($clients as $client)
+                                <tr>
+                                    <td>{{ $client['id'] }}</td>
+                                    <td>{{ $client['client_name'] }}</td>
+                                    <td>{{ $client['company_name'] }}</td>
+                                    <td>{{ $client['risk_manager'] }}</td>
+                                    <td>{{ $client['commercial_budget'] }}</td>
+                                    <td>{{ $client['industry_sector'] }}</td>
+                                    <td>{{ $client['description'] }}</td>
+                                    <td>{{ $client['facility'] }}</td>
+                                    <td>{{ $client['risk_owner'] }}</td>
+                                    <td>{{ $client['date_raised'] }}</td>
+                                    <td>{{ $client['risk_occurrence'] }}</td>
+                                    <td>{{ $client['risk_bearer'] }}</td>
+                                    <td>{{ $client['probability'] }}</td>
+                                    <td>{{ $client['status'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <canvas id="probabilityChart" width="400" height="300"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     </nav>
     </div><!-- End Page Title -->
+   <!-- JavaScript for Chart.js -->
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script>
+       // Get probability values from clients data
+       var probabilities = @json(array_column($clients, 'probability'));
 
-
+       // Create a chart
+       var ctx = document.getElementById('probabilityChart').getContext('2d');
+       var myChart = new Chart(ctx, {
+           type: 'doughnut',
+           data: {
+               labels: probabilities.map((_, i) => 'Risk ' + (i + 1)),
+               datasets: [{
+                   label: 'Probability',
+                   data: probabilities,
+                   backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                   borderColor: 'rgba(54, 162, 235, 1)',
+                   borderWidth: 1
+               }]
+           },
+           options: {
+               scales: {
+                   y: {
+                       beginAtZero: true
+                   }
+               }
+           }
+       });
+   </script>
 
 <!-- Modal -->
 <div class="modal fade" id="budgetReportModal" tabindex="-1" aria-labelledby="budgetReportModalLabel" aria-hidden="true">
