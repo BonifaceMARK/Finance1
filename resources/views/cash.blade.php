@@ -18,34 +18,107 @@
             <li class="breadcrumb-item"><a href="index.html">Home</a></li>
             <li class="breadcrumb-item active">Cash Management</li>
         </ol>
+
     </nav>
     </div><!-- End Page Title -->
     <section>
         <div >
 
-<!-- If-else statement -->
-@if(session('success'))
-<div class="alert alert-success" role="alert">
-    <strong>Success:</strong> {{ session('success') }}
-</div>
-@endif
-<!-- Error message -->
-@if($errors->any())
-<div class="alert alert-danger" role="alert">
-    <strong>Error:</strong>
-        @foreach($errors->all() as $error)
-       {{ $error }}
-        @endforeach
-</div>
-@endif
+            @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-<div class="container">
-    <div class="row">
-   <!-- Income and Outflow card -->
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+
+<!-- Button Trigger -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionsModal">
+    Open Transactions
+</button>
+
+<div class="modal fade" id="transactionsModal" tabindex="-1" aria-labelledby="transactionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionsModalLabel">Transactions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product Name</th>
+                                <th>Transaction Amount</th>
+                                <th>Description</th>
+                                <th>Transaction Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($transactions as $transaction)
+                            <tr data-transaction-id="{{ $transaction['id'] }}">
+                                <td>{{ $transaction['id'] }}</td>
+                                <td>{{ $transaction['productName'] }}</td>
+                                <td>{{ $transaction['transactionAmount'] }}</td>
+                                <td>{{ $transaction['description'] }}</td>
+                                <td>{{ $transaction['transactionStatus'] }}</td>
+                                <td>
+                                    @if ($transaction['transactionStatus'] === 'approved')
+                                        @if (in_array($transaction['id'], $addedToInflowTransactionIds))
+                                            <button type="button" class="btn btn-primary" disabled>
+                                                Already Added to Inflow
+                                            </button>
+                                        @else
+                                            <form action="{{ route('add.to.inflow') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="transaction_id" value="{{ $transaction['id'] }}">
+                                                <input type="hidden" name="transaction_amount" value="{{ $transaction['transactionAmount'] }}">
+                                                <button type="submit" class="btn btn-primary add-to-inflow-btn" data-transaction-id="{{ $transaction['id'] }}">
+                                                    Add to inflow
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <button type="button" class="btn btn-primary" disabled>
+                                            Transaction Not Approved
+                                        </button>
+                                    @endif
+                                </td>
+
+                            </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+ <!-- Income and Outflow card -->
 <div class="col-md-12 mb-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
             <h3 class="mb-0">Revenue and Outflow</h3>
+
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -62,7 +135,7 @@
                                 ${{ number_format($totalInflow, 2) }}
                             </td>
                             <td class="text-danger">
-                                ${{ number_format($totalOutflow, 2) }}
+                                ${{ number_format($finalOutflow, 2) }}
                             </td>
                         </tr>
                     </tbody>
@@ -74,13 +147,14 @@
 <!-- End Income and Outflow card -->
 
 
+
                 </div>
             </div>
         </div>
     </div>
     <div class="container">
         <div class="card shadow" style="background-image: url('{{ asset('assets/img/budge.jpg') }}'); background-size: cover; opacity: 1;">
-            <div class="card-header text-white"  style="background-color: rgba(255, 255, 255, 0.5);">
+            <div class="card-header text-white" style="background-color: rgba(255, 255, 255, 0.5);">
                 <h5 class="mb-0 "><strong>Budget Requests</strong></h5>
             </div>
 
@@ -96,21 +170,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($budgets ?? [] as $budget)
-                                @if ($budget['status'] == 'pending')
-                                    <tr>
-                                        <td class="text-center">{{ $budget['id'] }}</td>
-                                        <td>{{ $budget['title'] }}</td>
-                                        <td>{{ $budget['status'] }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#budgetModal{{ $budget['id'] }}">View</button>
-                                        </td>
-                                    </tr>
-                                @endif
+                            @forelse ($pendingAndApprovedBudgets ?? [] as $budget)
+                            <tr>
+                                <td class="text-center">{{ $budget['id'] }}</td>
+                                <td>{{ $budget['title'] }}</td>
+                                <td>{{ $budget['status'] }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#budgetModal{{ $budget['id'] }}">View</button>
+                                </td>
+                            </tr>
                             @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No pending budgets found</td>
-                                </tr>
+                            <tr>
+                                <td colspan="4" class="text-center">No pending or approved budgets found</td>
+                            </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -119,11 +191,7 @@
         </div>
     </div>
 
-
-
-
-
-    @foreach ($budgets ?? [] as $budget)
+    @foreach ($pendingAndApprovedBudgets ?? [] as $budget)
     <!-- Modal for budget details -->
     <div class="modal fade" id="budgetModal{{ $budget['id'] }}" tabindex="-1" aria-labelledby="budgetModalLabel{{ $budget['id'] }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -171,16 +239,19 @@
                 </div>
                 <div class="modal-footer bg-primary">
                     <!-- Form to allocate budget -->
-                    @if ($budget['status'] === 'approved')
-                        <form action="{{ route('budget.allocate', $budget['id']) }}" method="POST">
+                    @if (in_array($budget['id'], $allocatedBudgetIds))
+                        <button type="button" class="btn btn-secondary disabled" disabled>Budget Already Allocated</button>
+                    @elseif ($budget['status'] === 'approved')
+                        <form id="allocateForm{{ $budget['id'] }}" action="{{ route('budget.allocate', $budget['id']) }}" method="POST">
                             @csrf
                             <!-- Add hidden input field to pass budget data -->
                             <input type="hidden" name="budget" value="{{ json_encode($budget) }}">
-                            <button type="submit" class="btn btn-success">Allocate Budget</button>
+                            <button type="submit" class="btn btn-success allocate-budget-btn">Allocate Budget</button>
                         </form>
                     @else
                         <button type="button" class="btn btn-secondary disabled" disabled>Cannot Allocate Budget</button>
                     @endif
+
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -188,6 +259,11 @@
     </div>
     <!-- End Modal for budget details -->
 @endforeach
+
+
+
+
+
 
 </div>
 </section>

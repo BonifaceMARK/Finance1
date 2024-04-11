@@ -15,7 +15,8 @@ class CreateAllocatedBudgetsTable extends Migration
     {
         Schema::create('allocated_budgets', function (Blueprint $table) {
             $table->id();
-            $table->decimal('amount', 15, 2); // Decimal column for allocated budget amount
+            $table->unsignedBigInteger('budget_id')->nullable();
+            $table->decimal('amount', 15, 2);
             $table->timestamps();
         });
     }
@@ -30,3 +31,4 @@ class CreateAllocatedBudgetsTable extends Migration
         Schema::dropIfExists('allocated_budgets');
     }
 }
+

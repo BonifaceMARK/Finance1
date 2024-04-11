@@ -18,6 +18,10 @@
             <li class="breadcrumb-item"><a href="index.html">Home</a></li>
             <li class="breadcrumb-item active">Financial Planning & Reporting</li>
         </ol>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBudgetPlanModal">
+    Create Budget Plan
+</button>
+
     </nav>
     </div><!-- End Page Title -->
 
@@ -42,59 +46,110 @@
 
 <div class="container mt-12">
     <div class="row">
-        <!-- Financial Health Status card -->
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Financial Health Status</h5>
+     <!-- Financial Health Status card -->
+<div class="col-md-12">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Financial Health Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Description</th>
+                                <th scope="col">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($cashManagements as $cashManagement)
+                                <tr>
+                                    <td>Revenue</td>
+                                    <td>{{ number_format($cashManagement->inflow, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Outflow</td>
+                                    <td>{{ number_format( $finalOutflow, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Net Income</td>
+                                    <td>{{ number_format($cashManagement->net_income, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Description</th>
-                                        <th scope="col">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Revenue</td>
-                                        <td>{{ number_format($totalInflow, 2) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Expenses</td>
-                                        <td>{{ number_format($totalOutflow, 2) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Net Income</td>
-                                        <td>{{ number_format($netIncome, 2) }}</td>
-                                    </tr>
 
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="alert alert-info">
-                                <strong>Note:</strong> This financial health status is based on the calculation of Net Income.
-                            </div>
-                            <h4 class="text-right mb-0">Net Income: <span class="{{ $netIncomeStatus }}">{{ number_format($netIncome, 2) }}</span></h4>
-                            <p class="text-right">
-                                @if ($netIncomeStatus == 'status-good')
-                                    Congratulations! Your financial health status is good.
-                                @elseif ($netIncomeStatus == 'status-ok')
-                                    Your financial health status is okay. Consider improving it.
-                                @else
-                                    Warning! Your financial health status is not good. Take necessary actions.
-                                @endif
-                            </p>
-                        </div>
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> This financial health status is based on the calculation of Net Income.
                     </div>
+                    @if ($latestCashManagement)
+                        <h4 class="text-right mb-0">Net Income: <span class="{{ $netIncomeStatus }}">{{ number_format($latestCashManagement->net_income, 2) }}</span></h4>
+                    @else
+                        <h4 class="text-right mb-0">Net Income: <span class="{{ $netIncomeStatus }}">N/A</span></h4>
+                    @endif
+                    <p class="text-right">
+                        @if ($netIncomeStatus == 'status-good')
+                            Congratulations! Your financial health status is good.
+                        @elseif ($netIncomeStatus == 'status-ok')
+                            Your financial health status is okay. Consider improving it.
+                        @else
+                            Warning! Your financial health status is not good. Take necessary actions.
+                        @endif
+                    </p>
                 </div>
+
+
             </div>
         </div>
-        <!-- End Financial Health Status card -->
+    </div>
+</div>
+<!-- End Financial Health Status card -->
+<div class="modal fade" id="createBudgetPlanModal" tabindex="-1" aria-labelledby="createBudgetPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBudgetPlanModalLabel">Create Budget Plan</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createBudgetPlanForm" method="POST" action="{{ route('budgetplans.store') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label for="reference">Reference</label>
+                        <input id="reference" type="text" class="form-control" name="reference" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input id="name" type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input id="amount" type="number" step="0.01" class="form-control" name="amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input id="start_date" type="date" class="form-control" name="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input id="end_date" type="date" class="form-control" name="end_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" class="form-control" name="description" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Budget Plan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
         <!-- Create Cost Allocation Method Button -->
         <div class="col-md-3 mb-3">

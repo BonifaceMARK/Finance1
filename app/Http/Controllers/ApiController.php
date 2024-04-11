@@ -7,6 +7,7 @@ use App\Models\CostAllocationMethod;
 use App\Models\ExpenseCategory;
 use App\Models\CashManagement;
 use App\Models\AllocatedBudget;
+use App\Models\BudgetPlan;
 
 
 
@@ -82,5 +83,35 @@ class ApiController extends Controller
             'cost_allocation_methods' => $costAllocationMethods,
             'expense_categories' => $expenseCategories,
         ]);
+    }
+    public function fetchAndUpdate()
+    {
+        // Fetch external data
+        $response = Http::get('https://fms10-vaims.fguardians-fms.com/api/users/accounts?fbclid=IwAR26qcPYnsgXNri1zuZQSV0ocDRqlp2-1GwHlY3YJFjRMVuPxzZGbeWeyA8_aem_AZqL7tcboWq7yoMKXrTsIRfNpR2sv6ANyblc9zYHcVJmf8qJN_l7k5-Bd4GsVQnURNZA_kWam8s8trhaXwd83idJ');
+
+        // Check if the request was successful
+        if ($response->successful()) {
+            // Parse JSON response
+            $data = $response->json();
+
+            // Iterate through each user and update CashManagement model
+            foreach ($data['users'] as $user) {
+                $amount = (float) $user['amount']; // Convert amount to float
+
+                // Update CashManagement model with only inflow attribute
+                CashManagement::create([
+                    'inflow' => $amount
+                ]);
+            }
+
+            return response()->json(['message' => 'Data fetched and inflow updated successfully'], 200);
+        } else {
+            return response()->json(['error' => 'Failed to fetch data from the external API'], $response->status());
+        }
+    }
+    public function indexJson()
+    {
+        $budgetPlans = BudgetPlan::all();
+        return response()->json($budgetPlans->toArray());
     }
 }

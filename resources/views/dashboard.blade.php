@@ -285,7 +285,7 @@
                                                 <td>{{ $cost['id'] }}</td>
                                                 <td>{{ $cost['cost_center'] }}</td>
                                                 <td>{{ $cost['cost_category'] }}</td>
-                                                <td>{{ $cost['allocation_method'] }}</td>
+                                                <td>{{ $cost['cost_type'] }}</td>
                                                 <td>${{ number_format($cost['amount'], 2) }}</td>
                                                 <td>{{ $cost['description'] ?? 'N/A' }}</td>
                                                 <td>{{ $cost['created_at'] }}</td>

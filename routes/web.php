@@ -31,14 +31,21 @@ Route::get('/financialplan', [ApiController::class, 'getCashOutflows']);
 
 Route::post('/add-expense-from-external', [CashController::class, 'addExpenseFromExternal'])->name('addExpenseFromExternal');
 
+Route::get('/fetch-and-update', [ApiController::class, 'fetchAndUpdate']);
+
 Route::get('/budgets/{id}', [CashController::class, 'showBudget'])->name('budget.show');
 
 // Route for allocating budget
-Route::post('/allocate/{id}/budget', [CashController::class, 'allocate'])->name('budget.allocate');
+Route::post('/budget/allocate/{id}', [CashController::class, 'allocate'])->name('budget.allocate');
 
+
+Route::post('/add-to-inflow', [CashController::class, 'addToInflow'])->name('add.to.inflow');
 //API
 Route::get('/Cost', [ReportingController::class, 'fetchCost']);
 Route::get('/bato', [ApiController::class, 'fetch']);
 Route::get('/allocatebud', [ApiController::class, 'fetchAllocatedBudget']);
 Route::get('/cash', [ApiController::class, 'fetchCashManagement']);
 Route::get('/method', [ApiController::class, 'CategoryMethod']);
+Route::get('/budgetplans/json', [ApiController::class, 'indexJson'])->name('budgetplans.json');
+
+Route::post('/budgetplans', [ReportingController::class, 'storeBudget'])->name('budgetplans.store');
