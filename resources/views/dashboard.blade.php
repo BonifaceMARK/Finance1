@@ -18,10 +18,326 @@
             <li class="breadcrumb-item"><a href="index.html">Home</a></li>
             <li class="breadcrumb-item active">Dashboard</li>
         </ol>
+        <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#financialReportModal">
+    View Expenses Financial Report
+</button>
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#costAllocationModal">
+    View Cost Allocation Report
+</button>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#budgetReportModal">
+        View Budget Report
+    </button>
+
     </nav>
     </div><!-- End Page Title -->
 
 
+
+<!-- Modal -->
+<div class="modal fade" id="budgetReportModal" tabindex="-1" aria-labelledby="budgetReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="budgetReportModalLabel">Budget Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row justify-content-center">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">Budget Report Table</div>
+                                <div class="card-body">
+                                    <!-- Budget Report Table -->
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Reference</th>
+                                                    <th>Title</th>
+                                                    <th>Description</th>
+                                                    <th>Amount</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Status</th>
+                                                    <th>Comment</th>
+                                                    <th>Created By</th>
+                                                    <th>Created At</th>
+                                                    <th>Updated At</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($budget as $item)
+                                                <tr>
+                                                    <td>{{ $item['id'] }}</td>
+                                                    <td>{{ $item['reference'] }}</td>
+                                                    <td>{{ $item['title'] }}</td>
+                                                    <td>{{ $item['description'] }}</td>
+                                                    <td>{{ $item['amount'] }}</td>
+                                                    <td>{{ $item['start_date'] }}</td>
+                                                    <td>{{ $item['end_date'] }}</td>
+                                                    <td>{{ $item['status'] }}</td>
+                                                    <td>{{ $item['comment'] }}</td>
+                                                    <td>{{ $item['name'] }}</td>
+                                                    <td>{{ $item['created_at'] }}</td>
+                                                    <td>{{ $item['updated_at'] }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">Budget Chart</div>
+                                <div class="card-body">
+                                    <!-- Chart will be populated by JavaScript -->
+                                    <canvas id="budgetChart" width="400" height="400"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for fetching data and rendering chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch data from external API for the chart
+        fetch('https://fms2-ecabf.fguardians-fms.com/api/budgetApi')
+            .then(response => response.json())
+            .then(data => {
+                // Extract labels and data for the chart
+                const labels = data.map(item => item.title);
+                const amounts = data.map(item => parseFloat(item.amount));
+
+                // Render chart
+                const ctx = document.getElementById('budgetChart').getContext('2d');
+                const budgetChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Amount',
+                            data: amounts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="costAllocationModal" tabindex="-1" aria-labelledby="costAllocationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card bg-light"  style="background-image: url('{{ asset('assets/img/reportcost.jpg') }}'); background-size: cover;">
+                    <div class="card-header" style="background-color: rgba(255, 255, 255, 0.5);">
+                        <h3 class="card-title"><strong>Financial Report: Cost Allocation</strong></h3>
+                    </div>
+                    <div class="card-body">
+                        @if(!is_null($costs) && count($costs) > 0)
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr class="bg-secondary text-white">
+                                            <th>ID</th>
+                                            <th>Cost Center</th>
+                                            <th>Cost Category</th>
+                                            <th>Allocation Method</th>
+                                            <th>Amount</th>
+                                            <th>Description</th>
+                                            <th>Created At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($costs as $cost)
+                                            <tr>
+                                                <td>{{ $cost['id'] }}</td>
+                                                <td>{{ $cost['cost_center'] }}</td>
+                                                <td>{{ $cost['cost_category'] }}</td>
+                                                <td>{{ $cost['allocation_method'] }}</td>
+                                                <td>${{ number_format($cost['amount'], 2) }}</td>
+                                                <td>{{ $cost['description'] ?? 'N/A' }}</td>
+                                                <td>{{ $cost['created_at'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="alert alert-info" role="alert">
+                                No costs found.
+                            </div>
+                        @endif
+                    </div>
+
+                </div>
+                <canvas id="costAllocationChart" width="600" height="200"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for fetching data and rendering chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch data from external API for the chart
+        fetch('https://fms2-ecabf.fguardians-fms.com/api/costApi')
+            .then(response => response.json())
+            .then(data => {
+                // Extract data for the chart
+                const labels = data.map(cost => cost.cost_center);
+                const amounts = data.map(cost => parseFloat(cost.amount));
+
+                // Render chart
+                const ctx = document.getElementById('costAllocationChart').getContext('2d');
+                const costAllocationChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Allocated Cost',
+                            data: amounts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+<!-- Modal -->
+<div class="modal fade" id="financialReportModal" tabindex="-1" aria-labelledby="financialReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="financialReportModalLabel">Financial Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($expenses as $expense)
+                        <tr>
+                            <td>{{ $expense['id'] }}</td>
+                            <td>{{ $expense['item'] }}</td>
+                            <td>{{ $expense['date'] }}</td>
+                            <td>{{ $expense['amount'] }}</td>
+                            <td>{{ $expense['category'] }}</td>
+                            <td>{{ $expense['description'] }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <canvas id="financialReportChart" width="600" height="200"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for fetching data and rendering the chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('https://fms2-ecabf.fguardians-fms.com/api/expensesApi')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(expense => expense.item);
+                const amounts = data.map(expense => parseFloat(expense.amount));
+
+                const ctx = document.getElementById('financialReportChart').getContext('2d');
+                const financialReportChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Expenses Amount',
+                            data: amounts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
     <div class="container" >
         <div class="row justify-content-center">
             <div class="col-lg-12">

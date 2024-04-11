@@ -166,54 +166,7 @@
         </script>
     </div>
 
-  <!-- Financial Report Document -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card bg-light"  style="background-image: url('{{ asset('assets/img/reportcost.jpg') }}'); background-size: cover;">
-            <div class="card-header" style="background-color: rgba(255, 255, 255, 0.5);">
-                <h3 class="card-title"><strong>Financial Report: Cost Allocation</strong></h3>
-            </div>
-            <div class="card-body ">
 
-                @if(!is_null($costs) && count($costs) > 0)
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr class="bg-secondary text-white">
-                                    <th>ID</th>
-                                    <th>Cost Center</th>
-                                    <th>Cost Category</th>
-                                    <th>Allocation Method</th>
-                                    <th>Amount</th>
-                                    <th>Description</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($costs as $cost)
-                                    <tr>
-                                        <td>{{ $cost['id'] }}</td>
-                                        <td>{{ $cost['cost_center'] }}</td>
-                                        <td>{{ $cost['cost_category'] }}</td>
-                                        <td>{{ $cost['allocation_method'] }}</td>
-                                        <td>${{ number_format($cost['amount'], 2) }}</td>
-                                        <td>{{ $cost['description'] ?? 'N/A' }}</td>
-                                        <td>{{ $cost['created_at'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="alert alert-info" role="alert">
-                        No costs found.
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End Financial Report Document -->
 
 </div>
 
